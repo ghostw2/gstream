@@ -15,5 +15,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// s.producers = []Producer{
+	// 	NewHTTPProducer(":3000"),
+	// 	NewHTTPConsumer(":4000"),
+	// }
 	s.Start()
+
 }

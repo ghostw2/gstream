@@ -9,7 +9,7 @@ type StoreProducerFunc func() Storer
 
 type Storer interface {
 	Push([]byte) (int, error)
-	Fetch(int) ([]byte, error)
+	Get(int) ([]byte, error)
 }
 
 type MemoryStore struct {
@@ -26,12 +26,13 @@ func NewMemoryStore() *MemoryStore {
 func (s *MemoryStore) Push(b []byte) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
+	fmt.Printf("the contents of data were %v", s.data)
 	s.data = append(s.data, b)
+	fmt.Printf("the contents of data are %v", s.data)
 	return len(s.data) - 1, nil
 }
 
-func (s *MemoryStore) Fetch(offset int) ([]byte, error) {
+func (s *MemoryStore) Get(offset int) ([]byte, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
