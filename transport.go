@@ -33,15 +33,16 @@ func (c *HTTPConsumer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 type HTTPProducer struct {
 	listenAddress string
-	server        *Server
+	channel       chan Message
 }
 
-func NewHTTPProducer(s *Server, listenAddress string) *HTTPProducer {
+func NewHTTPProducer(listenAddress string, channel chan Message) *HTTPProducer {
 	return &HTTPProducer{
 		listenAddress: listenAddress,
-		server:        s,
+		channel:       channel,
 	}
 }
+
 func (p *HTTPProducer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slog.Info("HTTP transport started ", "port", p.listenAddress)
 	path := strings.TrimPrefix(r.URL.Path, "/")
@@ -50,17 +51,7 @@ func (p *HTTPProducer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(paths)
 	// commit
 	if r.Method == http.MethodGet {
-		if len(paths) != 2 {
-			fmt.Println("Invalid Action")
-			return
-		}
-		topic := paths[1]
-		content, err := p.server.topics[topic].Get(0)
-		if err != nil {
-			fmt.Printf("error getting the message :%v \n ", err)
-		}
-		fmt.Printf("the content value of the message was :%v \n", string(content))
-
+		fmt.Println("method get unimplemented")
 	}
 	if r.Method == http.MethodPost {
 		if len(paths) != 2 {
@@ -71,14 +62,13 @@ func (p *HTTPProducer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("messages is being  sent to channel")
 		topic := paths[1]
-		p.server.createTopic(topic)
-		n, err := p.server.topics[topic].Push(content)
-		if err != nil {
-			fmt.Printf("there was an error producing :%v", err)
+		p.channel <- Message{
+			Topic:   topic,
+			Content: string(content),
 		}
-		fmt.Printf("successfully pushed :%d", n)
-		fmt.Printf("the content pushed was :%v\n", string(content))
+		fmt.Println("messages sent to channel")
 	}
 }
 func (p *HTTPProducer) HandlePublish(w http.ResponseWriter, r *http.Response) {

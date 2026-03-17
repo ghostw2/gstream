@@ -26,9 +26,9 @@ func NewMemoryStore() *MemoryStore {
 func (s *MemoryStore) Push(b []byte) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	fmt.Printf("the contents of data were %v", s.data)
+	fmt.Printf("the contents of data were %v\n", s.data)
 	s.data = append(s.data, b)
-	fmt.Printf("the contents of data are %v", s.data)
+	fmt.Printf("the contents of data are %v\n", s.data)
 	return len(s.data) - 1, nil
 }
 
